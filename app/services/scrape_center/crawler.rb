@@ -12,17 +12,17 @@ module ScrapeCenter
       list_html = @client.get("/page/#{page}")
       items = @parser.parse_list_page(list_html)
 
-      puts "-------------------------------- 当前页 items: #{items} --------------------------------"
+      # puts "-------------------------------- 当前页 items: #{items} --------------------------------"
       results = []
       items.each_with_index do |base_attrs, idx|
         begin
           detail_html = @client.get("/detail/#{base_attrs[:source_id]}")
           detail_attrs = @parser.parse_detail_page(detail_html)
-      puts "-------------------------------- 当前详情页 items: #{detail_attrs} --------------------------------"
+      # puts "-------------------------------- 当前详情页 items: #{detail_attrs} --------------------------------"
 
           movie_attrs = base_attrs.merge(detail_attrs)
 
-      puts "-------------------------------- 当前合并页 items: #{movie_attrs} --------------------------------"
+      # puts "-------------------------------- 当前合并页 items: #{movie_attrs} --------------------------------"
 
           results << movie_attrs
 

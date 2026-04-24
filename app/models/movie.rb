@@ -41,7 +41,7 @@ class Movie < ApplicationRecord
 
 
     # jsonb类型下？=或，@> 包含查询 必须加::jsonb 可能索引实效
-    
+
     # 类型标签  jsonb 数组包含查询
     categories = split_csv(params[:categories].presence || params[:category])
     if categories.any?
@@ -85,4 +85,58 @@ class Movie < ApplicationRecord
     str.split(",").map(&:strip).reject(&:blank?).uniq # 去重 去掉空格 去掉空字符串
   end
   private_class_method :split_csv
+
+
+  # 查询构建导出流
+  def self.all_export(params)
+    pk = Axlsx::Package.new
+    scope = filter(params)
+    wb = pk.workbook
+    header_style = wb.styles.add_style(b: true)
+
+    wb.add_worksheet(name: "Movies") do |sheet|
+      headers = ["ID", "详情页完整 URL", "片名", "类型标签", "国家/地区", "片长（分钟）", "上映日期", "海报图片地址", "剧情简介", "导演姓名", "评分（一位小数）", "创建时间", "更新时间"]
+      sheet.add_row(headers, style: header_style)
+
+      page_size = 1000
+      offset = 0
+      total = scope.count
+
+      # 小总页数 持续往下写
+      while offset < total
+        data = scope.offset(offset).limit(page_size).as_json(
+          only: [
+            :id, :source_url, :title, :categories, :region, :duration_minutes,
+            :release_date, :poster_url, :drama, :directors, :rating, :created_at, :updated_at
+          ]
+        )
+
+        # puts "-------------------------------- 查询结果data: #{data} --------------------------------"
+        data.each do |m|
+          sheet.add_row [
+            m["id"],
+            m["source_url"],
+            m["title"],
+            m["categories"],
+            m["region"],
+            m["duration_minutes"],
+            m["release_date"],
+            m["poster_url"],
+            m["drama"],
+            Array(m["directors"]).map { |d| d["name"] }.join(","),
+            m["rating"],
+            m["created_at"].to_time.strftime("%Y-%m-%d %H:%M:%S"),  # 格式化可读时间
+            m["updated_at"].to_time.strftime("%Y-%m-%d %H:%M:%S")
+          ]
+        end
+
+        offset += page_size
+        GC.start
+      end
+    end
+
+    # 打包流
+    pk.to_stream.read
+  end
 end
+

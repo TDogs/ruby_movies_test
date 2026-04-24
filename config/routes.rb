@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     # GET  详情
     get "movies/:id", to: "movies#dtl"
 
-    # GET  详情
+    # 导出
     post "movies/export", to: "movies#export"
   end
 end

@@ -1,5 +1,17 @@
 module Api
   class MoviesController < BaseController
+
+    # 导出
+    def export
+      xlsx = Movie.all_export(filter_params)
+      send_data(
+        xlsx,
+        filename: "movies_#{Time.zone.now.strftime('%Y%m%d_%H%M%S')}.xlsx",
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        disposition: "attachment"
+      )
+    end
+
     # 详情接口
     def dtl
       movie = Movie.find(params[:id])
