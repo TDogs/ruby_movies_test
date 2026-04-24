@@ -6,7 +6,7 @@ module ScrapeCenter
     # - 抓取某一页的电影列表
     # - 对列表里的每一部电影抓详情
     # - 把数据 upsert 写入 PG
-    # def perform(page:)
+    def perform(page:)
       puts " ================== 当前第#{page}页 开始处理 ================== "
 
       # 真正执行爬取 组装数据 并返回的方法
@@ -33,7 +33,7 @@ module ScrapeCenter
           )
 
         upserted_source_ids = Array(result&.rows).flatten.compact
-        # puts " ================== upsert_all 成功 returning_count=#{upserted_source_ids.length} source_ids=#{upserted_source_ids.first(8)} ================== "
+        puts " ================== upsert_all 成功 returning_count=#{upserted_source_ids.length} source_ids=#{upserted_source_ids.first(8)} ================== "
       rescue => e
         # puts " ================== upsert_all 失败 class=#{e.class} message=#{e.message} ================== "
         puts e.backtrace.first(12).join("\n")
