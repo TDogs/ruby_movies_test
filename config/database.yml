@@ -1,0 +1,72 @@
+default: &default
+  # 统一的 PostgreSQL 连接配置（各环境/各角色复用）
+  adapter: postgresql
+  encoding: unicode
+  host: localhost
+  username: root
+  password: root
+  # 连接池大小（建议与 Puma/线程数一致）
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  # primary：业务主库（ActiveRecord 默认使用）
+  primary:
+    <<: *default
+    database: ruby_db
+  # cache：Solid Cache 使用的连接（这里与主库同库不同迁移目录）
+  cache:
+    <<: *default
+    database: ruby_db
+    migrations_paths: db/cache_migrate
+  # queue：Solid Queue 使用的连接（这里与主库同库不同迁移目录）
+  queue:
+    <<: *default
+    database: ruby_db
+    migrations_paths: db/queue_migrate
+  # cable：Solid Cable（Action Cable 持久化）使用的连接（这里与主库同库不同迁移目录）
+  cable:
+    <<: *default
+    database: ruby_db
+    migrations_paths: db/cable_migrate
+
+test:
+  # primary：测试主库（运行测试时使用）
+  primary:
+    <<: *default
+    database: ruby_db
+  # cache：测试环境的 Solid Cache
+  cache:
+    <<: *default
+    database: ruby_db
+    migrations_paths: db/cache_migrate
+  # queue：测试环境的 Solid Queue
+  queue:
+    <<: *default
+    database: ruby_db
+    migrations_paths: db/queue_migrate
+  # cable：测试环境的 Solid Cable
+  cable:
+    <<: *default
+    database: ruby_db
+    migrations_paths: db/cable_migrate
+
+production:
+  # primary：生产主库
+  primary:
+    <<: *default
+    database: ruby_db
+  # cache：生产环境的 Solid Cache
+  cache:
+    <<: *default
+    database: ruby_db
+    migrations_paths: db/cache_migrate
+  # queue：生产环境的 Solid Queue
+  queue:
+    <<: *default
+    database: ruby_db
+    migrations_paths: db/queue_migrate
+  # cable：生产环境的 Solid Cable
+  cable:
+    <<: *default
+    database: ruby_db
+    migrations_paths: db/cable_migrate

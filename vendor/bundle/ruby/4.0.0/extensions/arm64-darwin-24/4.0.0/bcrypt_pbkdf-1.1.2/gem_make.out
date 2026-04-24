@@ -1,0 +1,47 @@
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/bcrypt_pbkdf-1.1.2/ext/mri
+/Users/hwb-go/.rbenv/versions/4.0.2/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/bcrypt_pbkdf-1.1.2/ext/mri
+make -j4 DESTDIR\= sitearchdir\=./.gem.20260422-31581-k1j2pq sitelibdir\=./.gem.20260422-31581-k1j2pq clean
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/bcrypt_pbkdf-1.1.2/ext/mri
+make -j4 DESTDIR\= sitearchdir\=./.gem.20260422-31581-k1j2pq sitelibdir\=./.gem.20260422-31581-k1j2pq
+compiling bcrypt_pbkdf.c
+compiling bcrypt_pbkdf_ext.c
+compiling blowfish.c
+compiling explicit_bzero.c
+bcrypt_pbkdf.c:81:40: warning: expression does not compute the number of elements in this array; element type is 'uint32_t' (aka 'unsigned int'), not 'uint64_t' (aka 'unsigned long long') [-Wsizeof-array-div]
+   81 |                 blf_enc(&state, cdata, sizeof(cdata) / sizeof(uint64_t));
+      |                                               ~~~~~  ^
+bcrypt_pbkdf.c:62:11: note: array 'cdata' declared here
+   62 |         uint32_t cdata[BCRYPT_WORDS];
+      |                  ^
+bcrypt_pbkdf.c:81:40: note: place parentheses around the 'sizeof(uint64_t)' expression to silence this warning
+   81 |                 blf_enc(&state, cdata, sizeof(cdata) / sizeof(uint64_t));
+      |                                                      ^
+compiling hash_sha512.c
+1 warning generated.
+bcrypt_pbkdf_ext.c:18:5: warning: implicit conversion loses integer precision: 'unsigned long' to 'unsigned int' [-Wshorten-64-to-32]
+   14 |   int ret = bcrypt_pbkdf(
+      |             ~~~~~~~~~~~~
+   15 |     StringValuePtr(pass), RSTRING_LEN(pass),
+   16 |     (const u_int8_t*)StringValuePtr(salt), RSTRING_LEN(salt),
+   17 |     okey, okeylen,
+   18 |     NUM2ULONG(rounds));
+      |     ^~~~~~~~~~~~~~~~~
+/Users/hwb-go/.rbenv/versions/4.0.2/include/ruby-4.0.0/ruby/internal/arithmetic/long.h:52:22: note: expanded from macro 'NUM2ULONG'
+   52 | #define NUM2ULONG    RB_NUM2ULONG         /**< @old{RB_NUM2ULONG} */
+      |                      ^
+/Users/hwb-go/.rbenv/versions/4.0.2/include/ruby-4.0.0/ruby/internal/arithmetic/long.h:58:22: note: expanded from macro 'RB_NUM2ULONG'
+   58 | #define RB_NUM2ULONG rb_num2ulong_inline  /**< @alias{rb_num2ulong_inline} */
+      |                      ^
+1 warning generated.
+linking shared-object bcrypt_pbkdf_ext.bundle
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/bcrypt_pbkdf-1.1.2/ext/mri
+make -j4 DESTDIR\= sitearchdir\=./.gem.20260422-31581-k1j2pq sitelibdir\=./.gem.20260422-31581-k1j2pq install
+/usr/bin/install -c -m 0755 bcrypt_pbkdf_ext.bundle ./.gem.20260422-31581-k1j2pq
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/bcrypt_pbkdf-1.1.2/ext/mri
+make DESTDIR\= sitearchdir\=./.gem.20260422-31581-k1j2pq sitelibdir\=./.gem.20260422-31581-k1j2pq clean

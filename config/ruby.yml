@@ -1,0 +1,82 @@
+version: "3.8"
+
+# 共享网络（所有服务在同一自定义桥接网络中，可通过服务名互访）
+networks:
+  rails_net:
+    driver: bridge
+
+services:
+  # 🌐 Rails Web 应用（主服务）
+  web:
+    build: .
+    command: bin/rails server -b 0.0.0.0:3000
+    ports:
+      - "3000:3000"
+    environment:
+      - RAILS_ENV=development
+      - NODE_ENV=development
+      - SPRING_ENABLED=true
+      # ✅ Rails 自动连接配置（推荐方式）
+      - DATABASE_URL=mysql2://rails:password@mysql:3306/rails_test_development
+      - REDIS_URL=redis://redis:6379/0
+      - MONGODB_URI=mongodb://mongo:27017/rails_test_development
+    volumes:
+      - .:/home/rails:cached
+      - bundle:/home/rails/vendor/bundle
+      - tmp:/home/rails/tmp
+    depends_on:
+      - mysql
+      - redis
+      - mongo
+    networks:
+      - rails_net
+
+  # 🐬 MySQL 8.4（ARM64/Intel 通用，官方镜像）
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: rails_test_development
+      MYSQL_USER: rails
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"  # 本地调试可映射，生产建议关闭
+    networks:
+      - rails_net
+
+  # 🧠 Redis 7（内存数据库，缓存/队列）
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"  # 本地调试开放
+    networks:
+      - rails_net
+
+  # 🐘 MongoDB 7（文档数据库，支持 ARM64）
+  mongo:
+    image: mongo:7-jammy
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
+      MONGO_INITDB_DATABASE: rails_test_development
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"  # 本地调试开放
+    networks:
+      - rails_net
+
+volumes:
+  mysql_data:
+  redis_data:
+  mongo_data:
+  bundle:
+  tmp:

@@ -1,0 +1,19 @@
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/erb-6.0.4/ext/erb/escape
+/Users/hwb-go/.rbenv/versions/4.0.2/bin/ruby extconf.rb
+checking for rb_ext_ractor_safe() in ruby.h... yes
+creating Makefile
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/erb-6.0.4/ext/erb/escape
+make -j4 DESTDIR\= sitearchdir\=./.gem.20260422-31581-90r0aw sitelibdir\=./.gem.20260422-31581-90r0aw clean
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/erb-6.0.4/ext/erb/escape
+make -j4 DESTDIR\= sitearchdir\=./.gem.20260422-31581-90r0aw sitelibdir\=./.gem.20260422-31581-90r0aw
+compiling escape.c
+linking shared-object erb/escape.bundle
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/erb-6.0.4/ext/erb/escape
+make -j4 DESTDIR\= sitearchdir\=./.gem.20260422-31581-90r0aw sitelibdir\=./.gem.20260422-31581-90r0aw install
+/usr/bin/install -c -m 0755 escape.bundle ./.gem.20260422-31581-90r0aw/erb
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/erb-6.0.4/ext/erb/escape
+make DESTDIR\= sitearchdir\=./.gem.20260422-31581-90r0aw sitelibdir\=./.gem.20260422-31581-90r0aw clean

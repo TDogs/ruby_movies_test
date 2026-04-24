@@ -1,0 +1,18 @@
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/3.3.0/gems/bindex-0.8.1/ext/skiptrace
+/Users/hwb-go/.rbenv/versions/3.3.3/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/3.3.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20260422-94046-uaber1 sitelibdir\=./.gem.20260422-94046-uaber1 clean
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/3.3.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20260422-94046-uaber1 sitelibdir\=./.gem.20260422-94046-uaber1
+compiling cruby.c
+linking shared-object skiptrace/internal/cruby.bundle
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/3.3.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20260422-94046-uaber1 sitelibdir\=./.gem.20260422-94046-uaber1 install
+/usr/bin/install -c -m 0755 cruby.bundle ./.gem.20260422-94046-uaber1/skiptrace/internal
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/3.3.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20260422-94046-uaber1 sitelibdir\=./.gem.20260422-94046-uaber1 clean

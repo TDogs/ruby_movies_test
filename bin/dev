@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+
+# Run web + Solid Queue worker together in development.
+
+PIDFILE = File.expand_path("../tmp/pids/server.pid", __dir__)
+
+def pid_running?(pid)
+  Process.kill(0, pid)
+  true
+rescue Errno::ESRCH
+  false
+rescue Errno::EPERM
+  # 进程存在但无权限发信号（也算“在运行”）
+  true
+end
+
+# Rails 会用 `tmp/pids/server.pid` 防止重复启动。
+# 如果上次异常退出留下了“僵尸 pid 文件”，这里自动清理，避免误报 “A server is already running”。
+if File.exist?(PIDFILE)
+  pid = Integer(File.read(PIDFILE).strip) rescue nil
+
+  if pid && pid_running?(pid)
+    warn "[dev] Rails server already running (pid: #{pid})."
+    warn "[dev] Tip: stop it first, or run `bin/rails solid_queue:start` in another terminal."
+    # 只启动 worker（让你能立刻消费队列），不再重复起 server。
+    ARGV.unshift("--no-web")
+  else
+    File.delete(PIDFILE) rescue nil
+  end
+end
+
+binding_flag_present = ARGV.include?("-b") || ARGV.include?("--binding")
+binding_host = ENV.fetch("BINDING", "127.0.0.1")
+
+no_web = ARGV.delete("--no-web")
+
+web_cmd =
+  if binding_flag_present
+    ["./bin/rails", "server", *ARGV]
+  else
+    ["./bin/rails", "server", "-b", binding_host, *ARGV]
+  end
+
+web_pid = no_web ? nil : Process.spawn(*web_cmd)
+worker_pid = Process.spawn("./bin/rails", "solid_queue:start")
+
+stop = lambda do
+  [web_pid, worker_pid].compact.each do |pid|
+    begin
+      Process.kill("TERM", pid)
+    rescue Errno::ESRCH
+      nil
+    end
+  end
+end
+
+%w[INT TERM].each { |sig| trap(sig) { stop.call } }
+
+begin
+  Process.wait
+ensure
+  stop.call
+end

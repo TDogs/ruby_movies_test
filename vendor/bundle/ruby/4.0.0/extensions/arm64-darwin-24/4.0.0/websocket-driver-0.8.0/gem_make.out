@@ -1,0 +1,18 @@
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/websocket-driver-0.8.0/ext/websocket-driver
+/Users/hwb-go/.rbenv/versions/4.0.2/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/websocket-driver-0.8.0/ext/websocket-driver
+make -j4 DESTDIR\= sitearchdir\=./.gem.20260422-31581-3qn5k0 sitelibdir\=./.gem.20260422-31581-3qn5k0 clean
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/websocket-driver-0.8.0/ext/websocket-driver
+make -j4 DESTDIR\= sitearchdir\=./.gem.20260422-31581-3qn5k0 sitelibdir\=./.gem.20260422-31581-3qn5k0
+compiling websocket_mask.c
+linking shared-object websocket_mask.bundle
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/websocket-driver-0.8.0/ext/websocket-driver
+make -j4 DESTDIR\= sitearchdir\=./.gem.20260422-31581-3qn5k0 sitelibdir\=./.gem.20260422-31581-3qn5k0 install
+/usr/bin/install -c -m 0755 websocket_mask.bundle ./.gem.20260422-31581-3qn5k0
+
+current directory: /Users/hwb-go/Desktop/tmp/Pro/rails_test/vendor/bundle/ruby/4.0.0/gems/websocket-driver-0.8.0/ext/websocket-driver
+make DESTDIR\= sitearchdir\=./.gem.20260422-31581-3qn5k0 sitelibdir\=./.gem.20260422-31581-3qn5k0 clean
