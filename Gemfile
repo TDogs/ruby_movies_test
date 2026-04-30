@@ -34,7 +34,13 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
+group :development do
+  gem "mission_control-jobs"
+end
 
+# 新增redis 队列依赖  》8版本 强制走redis7+版本
+gem "sidekiq", "< 8"
+gem "jwt"
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 

@@ -1,0 +1,6 @@
+---
+:concurrency: <%= Integer(ENV.fetch("SIDEKIQ_CONCURRENCY", 5)) %>
+# 监听 不断增加的队列 《=5
+:queues:
+  - default
+  - scrape_center

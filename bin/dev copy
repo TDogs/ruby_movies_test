@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# Run web + worker together in development.
+# Run web + Solid Queue worker together in development.
 
 PIDFILE = File.expand_path("../tmp/pids/server.pid", __dir__)
 
@@ -21,7 +21,7 @@ if File.exist?(PIDFILE)
 
   if pid && pid_running?(pid)
     warn "[dev] Rails server already running (pid: #{pid})."
-    warn "[dev] Tip: stop it first, or run your worker in another terminal."
+    warn "[dev] Tip: stop it first, or run `bin/rails solid_queue:start` in another terminal."
     # 只启动 worker（让你能立刻消费队列），不再重复起 server。
     ARGV.unshift("--no-web")
   else
@@ -42,24 +42,7 @@ web_cmd =
   end
 
 web_pid = no_web ? nil : Process.spawn(*web_cmd)
-
-jobs_backend = ENV.fetch("JOBS_BACKEND", "sidekiq") # sidekiq | solid_queue
-
-worker_cmd =
-  case jobs_backend
-  when "sidekiq"
-    ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
-  when "solid_queue"
-    ["./bin/rails", "solid_queue:start"]
-  else
-    warn "[dev] Unknown JOBS_BACKEND=#{jobs_backend.inspect}, falling back to sidekiq"
-    ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
-  end
-
-worker_pid = Process.spawn(*worker_cmd)
-
-# 保留旧命令方便切回 DB 队列：
-# worker_pid = Process.spawn("./bin/rails", "solid_queue:start")
+worker_pid = Process.spawn("./bin/rails", "solid_queue:start")
 
 stop = lambda do
   [web_pid, worker_pid].compact.each do |pid|

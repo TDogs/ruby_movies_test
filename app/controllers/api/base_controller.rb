@@ -1,5 +1,5 @@
 module Api
-  class BaseController < ActionController::API
+  class BaseController < ApplicationController
     # 统一 JSON 输出格式，避免每个控制器重复写 render json: ...
     def render_json(data:, status: :ok)
       render json: data, status:

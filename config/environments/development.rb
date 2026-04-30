@@ -56,9 +56,12 @@ Rails.application.configure do
   config.active_job.verbose_enqueue_logs = true
 
   # Use Solid Queue (DB-backed) so crawling runs asynchronously.
-  # This makes the "crawl endpoint" enqueue jobs and return immediately.
-  config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
+  # This makes the "crawl endpoint" enqueue jobs and return immediately. 【solid_queue】
+  config.active_job.queue_adapter = :sidekiq
+  # config.solid_queue.connects_to = { database: { writing: :queue } }
+
+  # Local-only: make Mission Control Jobs accessible without Basic Auth.
+  config.mission_control.jobs.http_basic_auth_enabled = false
 
   # Highlight code that triggered redirect in logs.
   config.action_dispatch.verbose_redirect_logs = true

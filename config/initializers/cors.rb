@@ -15,6 +15,12 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       methods: %i[get options head],
       expose: [],
       max_age: 600
+
+    # 后台登录与鉴权接口
+    resource "/admin/*",
+      headers: :any,
+      methods: %i[get post put patch delete options head],
+      expose: [],
+      max_age: 600
   end
 end
-

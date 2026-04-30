@@ -1,5 +1,21 @@
 module Api
   class MoviesController < BaseController
+    def home
+      puts " ================== params: #{params} ================== "
+      page = [ params.fetch(:page, 1).to_i, 1 ].max
+      page_size = [ [ params.fetch(:page_size, 10).to_i, 1 ].max, 60 ].min
+      # @movies = Movie.order(id: :desc).offset((page - 1) * page_size).limit(page_size)
+
+      base_scope = Movie.filter(filter_params)
+      @movies = base_scope
+      .offset((page - 1) * page_size)
+      .limit(page_size)
+      @pagination = {
+        page:,
+        page_size:,
+        total: base_scope.count
+      }
+    end
 
     # 导出
     def export
@@ -12,17 +28,23 @@ module Api
       )
     end
 
-    # 详情接口
+    # 详情接口（json）
     def dtl
       movie = Movie.find(params[:id])
       render_json(data: movie)
     end
 
+    # 详情页 (非json)
+    def dtl_page
+      @movie_dtl = Movie.find(params[:id])
+      render :dtl
+    end
+
     # 查询接口
     def index
-      page = [params.fetch(:page, 1).to_i, 1].max
+      page = [ params.fetch(:page, 1).to_i, 1 ].max
       page_size = params.fetch(:page_size, 10).to_i
-      page_size = [[page_size, 1].max, 200].min
+      page_size = [ [ page_size, 1 ].max, 200 ].min
 
       base_scope = Movie.filter(filter_params)
       total = base_scope.count

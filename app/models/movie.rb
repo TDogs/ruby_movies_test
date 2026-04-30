@@ -21,7 +21,7 @@ class Movie < ApplicationRecord
 
     # 时长
     if params[:duration_minutes_from].present?
-      
+
       scope = scope.where("duration_minutes >= ?", params[:duration_minutes_from].to_i)
     end
 
@@ -51,8 +51,28 @@ class Movie < ApplicationRecord
     # 导演：jsonb 数组包含查询【和标签写法不一样 ，标签是and查询 导演这里暂时用or查询】
     directors = split_csv(params[:directors].presence || params[:director])
     if directors.any?
-      # `?|`：jsonb 是否包含“任意一个”字符串元素（OR 语义）
-      scope = scope.where("directors ?| array[:names]", names: directors)
+      # `directors` 存储的是对象数组：[{ "name": "...", "image": "..." }, ...]
+      # 所以不能用 `?|`（它只适用于顶层为字符串的场景），而应该用 `@>` 做对象包含匹配。
+      # 这里支持多个导演名，语义为 OR：任意一个导演命中即可。
+      or_sql = directors.map { "directors @> ?::jsonb" }.join(" OR ")
+      or_values = directors.map { |name| [ { "name" => name } ].to_json }
+      puts " ================== or_sql: #{or_sql} ================== "
+      puts " ================== or_values: #{or_values} ================== "
+
+      # 赋值替换
+      # or_sql: directors @> ?::jsonb OR directors @> ?::jsonb
+      # ["[{\"name\":\"周星驰\"}]", "[{\"name\":\"罗伯·明可夫\"}]"]
+      scope = scope.where(or_sql, *or_values)
+
+
+      # 字符串数组包含查询
+      # scope = scope.where("directors ?| array[:names]", names: directors)
+
+
+      # directors.each do |name|
+      #   scope = scope.where("directors @> ?::jsonb", [ { "name" => name } ].to_json)
+      # end
+
     end
 
     # 演员：jsonb 对象数组“存在某个对象”查询
@@ -81,7 +101,7 @@ class Movie < ApplicationRecord
   # 参数过滤 字符串最终转数组
   def self.split_csv(str)
     return [] if str.blank?
-  
+
     str.split(",").map(&:strip).reject(&:blank?).uniq # 去重 去掉空格 去掉空字符串
   end
   private_class_method :split_csv
@@ -95,7 +115,7 @@ class Movie < ApplicationRecord
     header_style = wb.styles.add_style(b: true)
 
     wb.add_worksheet(name: "Movies") do |sheet|
-      headers = ["ID", "详情页完整 URL", "片名", "类型标签", "国家/地区", "片长（分钟）", "上映日期", "海报图片地址", "剧情简介", "导演姓名", "评分（一位小数）", "创建时间", "更新时间"]
+      headers = [ "ID", "详情页完整 URL", "片名", "类型标签", "国家/地区", "片长（分钟）", "上映日期", "海报图片地址", "剧情简介", "导演姓名", "评分（一位小数）", "创建时间", "更新时间" ]
       sheet.add_row(headers, style: header_style)
 
       page_size = 1000
@@ -139,4 +159,3 @@ class Movie < ApplicationRecord
     pk.to_stream.read
   end
 end
-

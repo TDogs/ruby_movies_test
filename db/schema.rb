@@ -30,15 +30,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_120000) do
     t.jsonb "subtitle", default: [], null: false, comment: "剧照图片地址"
     t.string "title", null: false, comment: "片名"
     t.datetime "updated_at", null: false, comment: "更新时间"
-    t.index ["actors"], name: "index_movies_on_actors", using: :gin
-    t.index ["categories"], name: "index_movies_on_categories", using: :gin
-    t.index ["directors"], name: "index_movies_on_directors", using: :gin
     t.index ["duration_minutes"], name: "index_movies_on_duration_minutes"
     t.index ["rating"], name: "index_movies_on_rating"
     t.index ["region"], name: "index_movies_on_region"
     t.index ["release_date"], name: "index_movies_on_release_date"
-    t.index ["source_id"], name: "index_movies_on_source_id", unique: true
     t.index ["title"], name: "index_movies_on_title"
+  end
+
+  create_table "moviescopy", id: :bigint, default: -> { "nextval('movies_id_seq1'::regclass)" }, comment: "电影主数据", force: :cascade do |t|
+    t.jsonb "actors", default: [], null: false, comment: "演员列表"
+    t.jsonb "categories", default: [], null: false, comment: "类型标签"
+    t.datetime "created_at", null: false, comment: "创建时间"
+    t.jsonb "directors", default: [], null: false, comment: "导演姓名"
+    t.text "drama", comment: "剧情简介"
+    t.integer "duration_minutes", comment: "片长（分钟）"
+    t.text "poster_url", comment: "海报图片地址"
+    t.decimal "rating", precision: 3, scale: 1, comment: "评分（一位小数）"
+    t.string "region", comment: "国家/地区"
+    t.date "release_date", comment: "上映日期"
+    t.integer "source_id", null: false, comment: "站点详情页数字 ID"
+    t.text "source_url", null: false, comment: "详情页完整 URL"
+    t.jsonb "subtitle", default: [], null: false, comment: "剧照图片地址"
+    t.string "title", null: false, comment: "片名"
+    t.datetime "updated_at", null: false, comment: "更新时间"
+    t.index ["actors"], name: "index_movies_on_actors", using: :gin
+    t.index ["categories"], name: "index_movies_on_categories", using: :gin
+    t.index ["directors"], name: "index_movies_on_directors", using: :gin
+    t.index ["source_id"], name: "index_movies_on_source_id", unique: true
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|
