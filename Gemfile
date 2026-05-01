@@ -39,7 +39,7 @@ group :development do
 end
 
 # 新增redis 队列依赖  》8版本 强制走redis7+版本
-gem "sidekiq", "< 8"
+gem "sidekiq", "< 9"
 gem "jwt"
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
