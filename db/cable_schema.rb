@@ -10,9 +10,47 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_24_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_06_101000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "admin", comment: "后台管理员", force: :cascade do |t|
+    t.datetime "created_at", comment: "创建时间"
+    t.string "email", comment: "邮箱"
+    t.text "password", null: false, comment: "密码"
+    t.string "phone", null: false, comment: "手机号"
+    t.string "remark", comment: "备注"
+    t.integer "role", limit: 2, default: 0, null: false, comment: "角色"
+    t.integer "status", limit: 2, default: 0, null: false, comment: "状态"
+    t.datetime "updated_at", comment: "更新时间"
+    t.string "username", null: false, comment: "用户名"
+  end
+
+  create_table "admin_menus", comment: "后台菜单", force: :cascade do |t|
+    t.bigint "created_admin", null: false, comment: "创建者id"
+    t.datetime "created_at", comment: "创建时间"
+    t.string "icon", comment: "菜单图标"
+    t.boolean "is_deleted", default: false, null: false, comment: "是否删除"
+    t.boolean "keep_alive", default: false, null: false, comment: "页面是否保持状态"
+    t.bigint "parent_m_id", comment: "父菜单id"
+    t.string "path", null: false, comment: "菜单路径"
+    t.boolean "show", default: true, null: false, comment: "是否显示在菜单上"
+    t.integer "sort_order", default: 0, null: false, comment: "菜单排序"
+    t.integer "status", limit: 2, default: 0, null: false, comment: "状态 1显示 0隐藏"
+    t.string "title", null: false, comment: "菜单名称"
+    t.datetime "updated_at", comment: "更新时间"
+    t.index ["parent_m_id"], name: "index_admin_menus_on_parent_m_id"
+    t.index ["path"], name: "index_admin_menus_on_path", unique: true
+  end
+
+  create_table "admin_powers", comment: "后台权限", force: :cascade do |t|
+    t.datetime "created_at", comment: "创建时间"
+    t.string "menu_id", limit: 255, null: false, comment: "菜单id"
+    t.string "name", null: false, comment: "权限名称"
+    t.integer "status", limit: 2, default: 0, null: false, comment: "状态"
+    t.datetime "updated_at", comment: "更新时间"
+    t.index ["menu_id"], name: "index_admin_powers_on_menu_id"
+  end
 
   create_table "movies", comment: "电影主数据（抓取自 ssr1.scrape.center）", force: :cascade do |t|
     t.jsonb "actors", default: [], null: false, comment: "演员列表（jsonb 数组，对象含 name/role/image 等）"
@@ -57,6 +95,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_120000) do
     t.index ["categories"], name: "index_movies_on_categories", using: :gin
     t.index ["directors"], name: "index_movies_on_directors", using: :gin
     t.index ["source_id"], name: "index_movies_on_source_id", unique: true
+  end
+
+  create_table "request_logs", id: :serial, force: :cascade do |t|
+    t.text "request", null: false
+    t.text "response", null: false
+    t.index ["id"], name: "ix_request_logs_id"
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|
@@ -189,6 +233,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_120000) do
     t.index ["expires_at"], name: "index_solid_queue_semaphores_on_expires_at"
     t.index ["key", "value"], name: "index_solid_queue_semaphores_on_key_and_value"
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
+  end
+
+  create_table "users", id: :serial, force: :cascade do |t|
+    t.datetime "created_at"
+    t.string "password_digest", null: false
+    t.datetime "updated_at"
+    t.string "username", limit: 255, null: false
+    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

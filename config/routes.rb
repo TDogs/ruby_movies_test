@@ -21,6 +21,9 @@ Rails.application.routes.draw do
   get "/dtl/:id", to: "api/movies#dtl_page"
 
   namespace :api do
+    post "users/reg", to: "users#reg"
+    post "users/login", to: "users#login"
+
     # POST 开启爬虫任务 具体x-x页码
     post "scrape/movies", to: "scrapes#movies"
 
@@ -33,6 +36,9 @@ Rails.application.routes.draw do
 
     # 导出
     post "movies/export", to: "movies#export"
+
+    # 收藏
+    post "movies/collect", to: "movies#collect"
   end
 
 
@@ -44,7 +50,8 @@ Rails.application.routes.draw do
       get "info", to: "admin#info"
       get "movies", to: "movies#list"
       post "logout", to: "admin#logout"
-      post "movies/update/:id", to: "movies#updat"
+      post "movies/update/:id", to: "movies#update"
+      post "movies/del/:id", to: "movies#del"
       post "upload", to: "movies#upload"
     end
   end

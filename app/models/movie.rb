@@ -8,6 +8,8 @@ class Movie < ApplicationRecord
   def self.filter(params)
     scope = all
 
+    scope = scope.where("is_deleted = ?", 0)
+
     # 片名
     # sanitize_sql_like 进行参数转义
     if params[:title].present?

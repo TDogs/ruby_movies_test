@@ -1,0 +1,79 @@
+#!/usr/bin/env ruby
+
+# Run web + worker together in production (same layout as bin/dev).
+# Requires SECRET_KEY_BASE or config/master.key (same as any production boot).
+
+ENV["RAILS_ENV"] = "production"
+
+PIDFILE = File.expand_path("../tmp/pids/server.pid", __dir__)
+
+def pid_running?(pid)
+  Process.kill(0, pid)
+  true
+rescue Errno::ESRCH
+  false
+rescue Errno::EPERM
+  true
+end
+
+if File.exist?(PIDFILE)
+  pid = Integer(File.read(PIDFILE).strip) rescue nil
+
+  if pid && pid_running?(pid)
+    warn "[prp] Rails server already running (pid: #{pid})."
+    warn "[prp] Tip: stop it first, or run your worker in another terminal."
+    ARGV.unshift("--no-web")
+  else
+    File.delete(PIDFILE) rescue nil
+  end
+end
+
+binding_flag_present = ARGV.include?("-b") || ARGV.include?("--binding")
+binding_host = ENV.fetch("BINDING", "127.0.0.1")
+
+no_web = ARGV.delete("--no-web")
+
+web_cmd =
+  if binding_flag_present
+    ["./bin/rails", "server", *ARGV]
+  else
+    ["./bin/rails", "server", "-b", binding_host, *ARGV]
+  end
+
+web_pid = no_web ? nil : Process.spawn(*web_cmd)
+
+# production.rb uses solid_queue; override with JOBS_BACKEND=sidekiq if you need Sidekiq locally
+# jobs_backend = ENV.fetch("JOBS_BACKEND", "solid_queue")
+jobs_backend = ENV.fetch("JOBS_BACKEND", "sidekiq") # sidekiq | solid_queue
+
+
+worker_cmd =
+  case jobs_backend
+  when "sidekiq"
+    ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
+  when "solid_queue"
+    ["./bin/rails", "solid_queue:start"]
+  else
+    warn "[prp] Unknown JOBS_BACKEND=#{jobs_backend.inspect}, falling back to solid_queue"
+    ["./bin/rails", "solid_queue:start"]
+  end
+
+worker_pid = Process.spawn(*worker_cmd)
+
+stop = lambda do
+  [web_pid, worker_pid].compact.each do |pid|
+    begin
+      Process.kill("TERM", pid)
+    rescue Errno::ESRCH
+      nil
+    end
+  end
+end
+
+%w[INT TERM].each { |sig| trap(sig) { stop.call } }
+
+begin
+  Process.wait
+ensure
+  stop.call
+end

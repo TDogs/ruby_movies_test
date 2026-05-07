@@ -40,10 +40,7 @@ module Admins
       )
     end
 
-    # 路由目前走 movies#updat（历史原因）。这里提供 update 作为别名，方便直觉使用。
-    def update = updat
-
-    def updat
+    def update
       movie = Movie.find(params[:id])
       attrs = movie_update_params
       r = movie.update(attrs)
@@ -60,6 +57,15 @@ module Admins
       }
     end
 
+    def del
+      movie = Movie.find(params[:id])
+      movie.update(is_deleted: 1)
+      render json: {
+        code: 200,
+        msg: "success"
+      }
+    end
+
     def upload
       file = params[:file]
       puts " ================== file: #{file} ================== "
@@ -70,10 +76,12 @@ module Admins
         FileUtils.mkdir_p(dir)
         file_path = dir.join(file.original_filename)
         File.binwrite(file_path, file.read)
+        # absolute_path = file_path.expand_path.to_s
+        # puts " ================== upload absolute path: #{absolute_path} ================== "
 
-        # Movie.find(params[:id]).update(poster_url: file.original_filename)
+        Movie.find(params[:id]).update(poster_url: file.original_filename)
 
-        render json: { msg: "文件上传成功", code: 200, data: { file_path: file_path.to_s } }
+        render json: { msg: "文件上传成功", code: 200, data: { file_path: absolute_path } }
       else
         render json: { msg: "文件上传失败", code: 200, data: {} }
       end
@@ -82,18 +90,16 @@ module Admins
     private
 
     def movie_update_params
-      params.permit(
+      raw = params.permit(
         :rating, :release_date, :duration_minutes, :region, :poster_url, :drama,
-        directors: [ :name ], # 对象 数组里每个元素是一个 Hash，只允许其中的 name 字段，例如 "directors": [{"name": "克里斯托夫·巴拉蒂"}] 接收不成功原因
+        directors: [ :name ], # 对象
         categories: [] # 数组 可以传多个
       )
 
-      puts " ================== raw: #{raw} ================== "
       puts " ================== raw: #{raw.inspect} ================== "
       attrs = raw.to_h
+      puts " ================== attrs: #{attrs} ================== "
 
-      # 兼容前端传 director（字符串）场景：落库字段是 directors(jsonb)
-      director = attrs.delete("director").presence
       directors = attrs["directors"].presence || director
       if directors.present?
         if directors.is_a?(Array) && directors.all? { |d| d.is_a?(Hash) && d["name"].present? }
