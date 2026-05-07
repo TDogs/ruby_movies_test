@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_07_113519) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_07_113346) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -54,7 +54,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_07_113519) do
     t.datetime "updated_at", comment: "更新时间"
     t.string "username", null: false, comment: "用户名"
     t.index ["phone"], name: "index_admin_news_on_phone", unique: true
-    t.index ["role"], name: "index_admin_news_on_role"
   end
 
   create_table "admin_powers", comment: "后台权限", force: :cascade do |t|
