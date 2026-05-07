@@ -9,8 +9,6 @@ module Admins
 
     def authenticate_admin_jwt!
       auth_header = request.headers["AccessToken"].to_s
-      # 兼容部分前端把 token 放在 body/query 里（推荐还是走 header）
-      auth_header = "bearer #{params[:accessToken]}" if auth_header.blank? && params[:accessToken].present?
       match = auth_header.match(/\Abearer\s+(.+)\z/)
 
       return render_unauthorized!("AccessToken 格式错误，应为: bearer <jwt>") unless match
@@ -27,7 +25,7 @@ module Admins
       @current_admin_jwt = payload
       @current_admin_payload = extract_sub_payload(payload["sub"])
       admin_id = @current_admin_payload["id"]
-      @current_admin = ::Admin.find_by(id: admin_id)
+      @current_admin = ::AdminNew.find_by(id: admin_id)
 
       render_unauthorized!("管理员不存在") unless @current_admin
     end

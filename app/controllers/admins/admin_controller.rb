@@ -5,12 +5,21 @@ module Admins
 
       attrs = filter_params
       encrypted_password = Utils.md5_hash(attrs[:password])
-      admin = Admin.find_by(username: attrs[:username], password: encrypted_password)
+      admin = AdminNew.find_by(username: attrs[:username], password: encrypted_password)
 
       if admin.present?
         expires_in = 2.hours.to_i
         token = Utils.build_admin_jwt(admin, exp_seconds: expires_in)
         render json: {
+          code: 200,
+          msg: "登录成功",
+          token_type: "bearer",
+          accessToken: token,
+          expires_in: expires_in
+        }
+
+
+        {
           code: 200,
           msg: "登录成功",
           token_type: "bearer",

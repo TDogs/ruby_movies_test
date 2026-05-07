@@ -38,7 +38,13 @@ Rails.application.routes.draw do
     post "movies/export", to: "movies#export"
 
     # 收藏
-    post "movies/collect", to: "movies#collect"
+    post "users/collect", to: "users#collect"
+
+    # 用户信息
+    get "users", to: "users#info"
+
+    # 更新
+    put "users", to: "users#update"
   end
 
 

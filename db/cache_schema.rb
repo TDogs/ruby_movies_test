@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_06_101000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_07_113519) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -43,6 +43,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_101000) do
     t.index ["path"], name: "index_admin_menus_on_path", unique: true
   end
 
+  create_table "admin_news", force: :cascade do |t|
+    t.datetime "created_at", null: false, comment: "创建时间"
+    t.string "email", comment: "邮箱"
+    t.text "password", null: false, comment: "密码"
+    t.string "phone", null: false, comment: "手机号"
+    t.text "remark", comment: "备注"
+    t.integer "role", comment: "角色"
+    t.integer "status", comment: "状态"
+    t.datetime "updated_at", comment: "更新时间"
+    t.string "username", null: false, comment: "用户名"
+    t.index ["phone"], name: "index_admin_news_on_phone", unique: true
+    t.index ["role"], name: "index_admin_news_on_role"
+  end
+
   create_table "admin_powers", comment: "后台权限", force: :cascade do |t|
     t.datetime "created_at", comment: "创建时间"
     t.string "menu_id", limit: 255, null: false, comment: "菜单id"
@@ -59,6 +73,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_101000) do
     t.jsonb "directors", default: [], null: false, comment: "导演姓名（jsonb 数组）"
     t.text "drama", comment: "剧情简介"
     t.integer "duration_minutes", comment: "片长（分钟）"
+    t.integer "is_deleted", default: 0, null: false, comment: "0否 1是"
     t.text "poster_url", comment: "海报图片地址"
     t.decimal "rating", precision: 3, scale: 1, comment: "评分（一位小数）"
     t.string "region", comment: "国家/地区"
@@ -95,6 +110,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_101000) do
     t.index ["categories"], name: "index_movies_on_categories", using: :gin
     t.index ["directors"], name: "index_movies_on_directors", using: :gin
     t.index ["source_id"], name: "index_movies_on_source_id", unique: true
+  end
+
+  create_table "p2s", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name"
+    t.integer "sex"
+    t.datetime "updated_at", null: false
+    t.index ["sex"], name: "index_p2s_on_sex"
   end
 
   create_table "request_logs", id: :serial, force: :cascade do |t|
@@ -235,12 +259,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_101000) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
-  create_table "users", id: :serial, force: :cascade do |t|
+  create_table "user2s", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "password", null: false
+    t.datetime "updated_at"
+    t.string "username", null: false
+    t.index ["username"], name: "index_users_on_username", unique: true
+  end
+
+  create_table "users_2", id: :integer, default: -> { "nextval('users_id_seq'::regclass)" }, force: :cascade do |t|
     t.datetime "created_at"
     t.string "password_digest", null: false
     t.datetime "updated_at"
     t.string "username", limit: 255, null: false
-    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

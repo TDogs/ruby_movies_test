@@ -1,8 +1,7 @@
 module Api
   class BaseController < ApplicationController
-    # 仅限收藏需要验证
-    skip_before_action :verify_authenticity_token, only: [ :collect ]
-    before_action :authenticate_user_jwt!, only: [ :collect ]
+    skip_before_action :verify_authenticity_token
+    before_action :authenticate_user_jwt!, if: -> { action_name == "collect" || action_name == "info" || action_name == "update" }
 
     def render_json(data:, status: :ok)
       render json: data, status:

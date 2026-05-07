@@ -70,10 +70,6 @@ module Api
       )
     end
 
-    # 收藏 ==
-    def collect
-      render_json(data: { ok: true })
-    end
 
     private
 
