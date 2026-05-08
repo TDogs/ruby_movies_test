@@ -50,6 +50,7 @@ Rails.application.routes.draw do
 
   scope :admin, module: :admins do
     post "login", to: "admin#login"
+    post "register", to: "admin#register"
 
     scope :auth do
       get "profile", to: "protected#profile"

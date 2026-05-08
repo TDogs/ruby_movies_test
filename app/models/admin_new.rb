@@ -2,14 +2,17 @@
 class AdminNew < ApplicationRecord
   self.table_name = "admin_news"
 
-  belongs_to :admin_power, class_name: "AdminPower", foreign_key: :role, primary_key: :id, optional: true
-  default_scope { includes(:admin_power) }
+  has_secure_password
+  validates :password, presence: true, length: { minimum: 6 } # 至少6位
+
+  belongs_to :admin_powers_new, class_name: "AdminPowersNew", foreign_key: :role, primary_key: :id, optional: true
+  default_scope { includes(:admin_powers_new) }
 
   def getInfoAndMenus(jwt_payload = {})
     jwt_data = jwt_payload.to_h.with_indifferent_access
     role_id = jwt_data[:role].presence || role
 
-    power = AdminPower.find_by(id: role_id)
+    power = AdminPowersNew.find_by(id: role_id)
     return [] if power.blank?
     puts " ================== power: #{power} ================== "
 
@@ -24,7 +27,7 @@ class AdminNew < ApplicationRecord
     puts " ================== menu_ids: #{menu_ids} ================== "
 
     # 查菜单 转数组
-    menu_records = AdminMenu.where(id: menu_ids).where(status: 1).order(sort_order: :asc).to_a
+    menu_records = AdminMenusNew.where(id: menu_ids).where(status: 1).order(sort_order: :asc).to_a
 puts " ================== menu_records: #{menu_records} ================== "
     #  构建树
     grouped = menu_records.group_by(&:parent_m_id)
@@ -47,7 +50,7 @@ puts " ================== grouped: #{grouped} ================== "
       "username": jwt_data[:username],
       "avatar": "",
       "permissions": [ "admin" ], # 后期修改
-      "menus": build_tree.call(nil)
+      "menus": build_tree.call(0)
     }
   end
 end

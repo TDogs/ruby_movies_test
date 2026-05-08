@@ -31,8 +31,7 @@ module Admins
     end
 
     def decode_token(token)
-      secret = ENV["JWT_SECRET"].presence || Rails.application.secret_key_base
-      decoded = JWT.decode(token, secret, true, { algorithm: "HS256" })
+      decoded = JWT.decode(token, Utils.admin_jwt_secret, true, { algorithm: "HS256" })
       decoded.first
     rescue JWT::DecodeError, JWT::VerificationError, JWT::ExpiredSignature => e
       render_unauthorized!("JWT 无效: #{e.message}")
@@ -46,7 +45,7 @@ module Admins
 
     # 设置不走验证
     def jwt_public_action?
-      controller_name == "admin" && action_name == "login"
+      controller_name == "admin" && action_name == "login" || action_name == "register"
     end
 
     def render_unauthorized!(message)

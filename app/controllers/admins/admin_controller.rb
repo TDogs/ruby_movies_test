@@ -1,25 +1,27 @@
 module Admins
   class AdminController < BaseController
+    def register
+      return unless validate_login_params!
+      attrs = filter_params
+      admin = AdminNew.new(attrs)
+      return render json: { message: admin.errors.full_messages.to_sentence } unless admin.save
+      render json: { message: "注册成功" }
+    end
+
     def login
       return unless validate_login_params!
 
       attrs = filter_params
-      encrypted_password = Utils.md5_hash(attrs[:password])
-      admin = AdminNew.find_by(username: attrs[:username], password: encrypted_password)
+      admin = AdminNew.find_by(username: attrs[:username])
+      puts("admin")
+      puts(admin.password_digest)
+      puts(attrs[:password])
 
-      if admin.present?
+
+      if admin&.authenticate(params[:password])
         expires_in = 2.hours.to_i
         token = Utils.build_admin_jwt(admin, exp_seconds: expires_in)
         render json: {
-          code: 200,
-          msg: "登录成功",
-          token_type: "bearer",
-          accessToken: token,
-          expires_in: expires_in
-        }
-
-
-        {
           code: 200,
           msg: "登录成功",
           token_type: "bearer",
@@ -79,7 +81,8 @@ module Admins
     def filter_params
       params.permit(
         :password,
-        :username
+        :username,
+        :phone
       )
     end
   end

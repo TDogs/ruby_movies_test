@@ -70,7 +70,7 @@ module ScrapeCenter
         { "name" => name, "image" => image }
           # 删除nil数据 返回数组
         end.compact
-        
+
       # 演员
       actors = doc.css("#detail .actors .actor").map do |node|
         name = node.at_css(".name")&.text&.strip

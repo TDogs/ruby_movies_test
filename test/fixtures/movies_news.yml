@@ -1,0 +1,33 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  actors: 
+  categories: 
+  directors: 
+  drama: MyString
+  duration_minutes: 1
+  is_deleted: 1
+  poster_url: MyString
+  rating: 9.99
+  region: MyString
+  release_date: 2026-05-08
+  source_id: 1
+  source_url: MyString
+  subtitle: 
+  title: MyString
+
+two:
+  actors: 
+  categories: 
+  directors: 
+  drama: MyString
+  duration_minutes: 1
+  is_deleted: 1
+  poster_url: MyString
+  rating: 9.99
+  region: MyString
+  release_date: 2026-05-08
+  source_id: 1
+  source_url: MyString
+  subtitle: 
+  title: MyString

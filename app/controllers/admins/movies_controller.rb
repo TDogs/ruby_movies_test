@@ -4,7 +4,7 @@ module Admins
   class MoviesController < BaseController
     # 详情接口（json）
     def dtl
-      movie = Movie.find(params[:id])
+      movie = MoviesNew.find(params[:id])
       render_json(data: movie)
     end
 
@@ -14,7 +14,7 @@ module Admins
       page_size = params.fetch(:page_size, 10).to_i
       page_size = [ [ page_size, 1 ].max, 200 ].min
 
-      base_scope = Movie.filter(filter_params)
+      base_scope = MoviesNew.filter(filter_params)
       total = base_scope.count
 
       movies = base_scope
@@ -41,7 +41,7 @@ module Admins
     end
 
     def update
-      movie = Movie.find(params[:id])
+      movie = MoviesNew.find(params[:id])
       attrs = movie_update_params
       r = movie.update(attrs)
 
@@ -58,7 +58,7 @@ module Admins
     end
 
     def del
-      movie = Movie.find(params[:id])
+      movie = MoviesNew.find(params[:id])
       movie.update(is_deleted: 1)
       render json: {
         code: 200,
@@ -79,7 +79,7 @@ module Admins
         # absolute_path = file_path.expand_path.to_s
         # puts " ================== upload absolute path: #{absolute_path} ================== "
 
-        Movie.find(params[:id]).update(poster_url: file.original_filename)
+        MoviesNew.find(params[:id]).update(poster_url: file.original_filename)
 
         render json: { msg: "文件上传成功", code: 200, data: { file_path: absolute_path } }
       else

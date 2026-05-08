@@ -1,16 +1,17 @@
+## 配置文件：
+.env 配置相关连接
+
 ## 表迁移：
 ```
-bin/rails db:migrate:queue
-bin/rails db:migrate:cache
-bin/rails db:migrate:cable
+bin/rails db:migrate
 ```
 
-## 启动（Web + Worker）
+## 启动（Web + Worker）：
 ```
 bin/dev
 ```
 
-## 队列 切换db 和 redis
+## 队列 切换db 和 redis：
 
 ```gemfile 增加
 gem "sidekiq", "< 8"    可选 <8，若 >=8 redis要大于7，反之大于6
@@ -27,3 +28,8 @@ bin/dev执行：
 
 redis下 需要手动显示的增加监听队列，在config/sideiq.yml中
 ```
+
+
+### 数据库：movies_sql.sql
+
+### 后台测试账号 admin admin123
