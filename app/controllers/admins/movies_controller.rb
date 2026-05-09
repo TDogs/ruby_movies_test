@@ -2,19 +2,19 @@ require "fileutils"
 
 module Admins
   class MoviesController < BaseController
-    # 详情接口（json）
+    # movie details
     def dtl
-      movie = MoviesNew.find(params[:id])
+      movie = Movie.find(params[:id])
       render_json(data: movie)
     end
 
-    # 查询接口
+    # search movies list
     def list
       page = [ params.fetch(:page, 1).to_i, 1 ].max
       page_size = params.fetch(:page_size, 10).to_i
       page_size = [ [ page_size, 1 ].max, 200 ].min
 
-      base_scope = MoviesNew.filter(filter_params)
+      base_scope = Movie.filter(filter_params)
       total = base_scope.count
 
       movies = base_scope
@@ -41,7 +41,7 @@ module Admins
     end
 
     def update
-      movie = MoviesNew.find(params[:id])
+      movie = Movie.find(params[:id])
       attrs = movie_update_params
       r = movie.update(attrs)
 
@@ -58,7 +58,7 @@ module Admins
     end
 
     def del
-      movie = MoviesNew.find(params[:id])
+      movie = Movie.find(params[:id])
       movie.update(is_deleted: 1)
       render json: {
         code: 200,
@@ -68,18 +68,13 @@ module Admins
 
     def upload
       file = params[:file]
-      puts " ================== file: #{file} ================== "
-      puts " ================== file---id: #{params[:id]} ================== "
-
       if file.present?
         dir = Rails.root.join("public", "uploads")
         FileUtils.mkdir_p(dir)
         file_path = dir.join(file.original_filename)
         File.binwrite(file_path, file.read)
-        # absolute_path = file_path.expand_path.to_s
-        # puts " ================== upload absolute path: #{absolute_path} ================== "
 
-        MoviesNew.find(params[:id]).update(poster_url: file.original_filename)
+        Movie.find(params[:id]).update(poster_url: file.original_filename)
 
         render json: { msg: "文件上传成功", code: 200, data: { file_path: absolute_path } }
       else
@@ -96,10 +91,7 @@ module Admins
         categories: [] # 数组 可以传多个
       )
 
-      puts " ================== raw: #{raw.inspect} ================== "
       attrs = raw.to_h
-      puts " ================== attrs: #{attrs} ================== "
-
       directors = attrs["directors"].presence || director
       if directors.present?
         if directors.is_a?(Array) && directors.all? { |d| d.is_a?(Hash) && d["name"].present? }

@@ -34,7 +34,7 @@ module Api
       user_id = payload.dig("sub", 0, "id")
       return render_unauthorized!("无效密钥") unless user_id
 
-      @current_user = UsersNew.find_by(id: user_id)
+      @current_user = User.find_by(id: user_id)
       render_unauthorized!("用户不存在") unless @current_user
 
     rescue JWT::DecodeError, JWT::VerificationError, JWT::ExpiredSignature => e

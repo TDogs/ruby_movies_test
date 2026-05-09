@@ -1,6 +1,7 @@
 # app/models/admin.rb
 class Admin < ApplicationRecord
-  self.table_name = "admin"
+  has_secure_password
+  validates :password, presence: true, length: { minimum: 6 }
 
   belongs_to :admin_power, class_name: "AdminPower", foreign_key: :role, primary_key: :id, optional: true
   default_scope { includes(:admin_power) }
@@ -8,10 +9,8 @@ class Admin < ApplicationRecord
   def getInfoAndMenus(jwt_payload = {})
     jwt_data = jwt_payload.to_h.with_indifferent_access
     role_id = jwt_data[:role].presence || role
-
     power = AdminPower.find_by(id: role_id)
     return [] if power.blank?
-    puts " ================== power: #{power} ================== "
 
     # 拿到所有 menu_id 字符串 转换为数组
     menu_ids = power.menu_id.to_s
@@ -21,14 +20,10 @@ class Admin < ApplicationRecord
                     .map(&:to_i)
                     .uniq
     return [] if menu_ids.empty?
-    puts " ================== menu_ids: #{menu_ids} ================== "
-
     # 查菜单 转数组
     menu_records = AdminMenu.where(id: menu_ids).where(status: 1).order(sort_order: :asc).to_a
-puts " ================== menu_records: #{menu_records} ================== "
     #  构建树
     grouped = menu_records.group_by(&:parent_m_id)
-puts " ================== grouped: #{grouped} ================== "
 
     # 递归构建
     build_tree = lambda do |parent_id|

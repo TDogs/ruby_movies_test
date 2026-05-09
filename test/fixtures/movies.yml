@@ -10,7 +10,7 @@ one:
   poster_url: MyString
   rating: 9.99
   region: MyString
-  release_date: 2026-05-08
+  release_date: 2026-05-09
   source_id: 1
   source_url: MyString
   subtitle: 
@@ -26,7 +26,7 @@ two:
   poster_url: MyString
   rating: 9.99
   region: MyString
-  release_date: 2026-05-08
+  release_date: 2026-05-09
   source_id: 1
   source_url: MyString
   subtitle: 

@@ -3,7 +3,7 @@ module Admins
     def register
       return unless validate_login_params!
       attrs = filter_params
-      admin = AdminNew.new(attrs)
+      admin = Admin.new(attrs)
       return render json: { message: admin.errors.full_messages.to_sentence } unless admin.save
       render json: { message: "注册成功" }
     end
@@ -12,13 +12,13 @@ module Admins
       return unless validate_login_params!
 
       attrs = filter_params
-      admin = AdminNew.find_by(username: attrs[:username])
-      puts("admin")
-      puts(admin.password_digest)
-      puts(attrs[:password])
+      admin = Admin.find_by(username: attrs[:username])
 
+      if admin.blank?
+        return render json: { message: "用户不存在" }
+      end
 
-      if admin&.authenticate(params[:password])
+      if admin.authenticate(params[:password])
         expires_in = 2.hours.to_i
         token = Utils.build_admin_jwt(admin, exp_seconds: expires_in)
         render json: {
@@ -36,7 +36,6 @@ module Admins
     def info
       # current_admin = admin实例
       data = current_admin.getInfoAndMenus(current_admin_payload)
-
       render json: {
         code: 200,
         msg: "success",

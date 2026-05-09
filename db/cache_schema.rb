@@ -10,39 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_08_080640) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_09_034252) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
-  create_table "admin", id: :bigint, default: -> { "nextval('admin_news_id_seq'::regclass)" }, force: :cascade do |t|
-    t.datetime "created_at", null: false, comment: "创建时间"
-    t.string "email", comment: "邮箱"
-    t.text "password", null: false, comment: "密码"
-    t.string "phone", null: false, comment: "手机号"
-    t.text "remark", comment: "备注"
-    t.integer "role", comment: "角色"
-    t.integer "status", comment: "状态"
-    t.datetime "updated_at", comment: "更新时间"
-    t.string "username", null: false, comment: "用户名"
-    t.index ["phone"], name: "index_admin_news_on_phone_copy1", unique: true
-    t.index ["role"], name: "index_admin_news_on_role_copy1"
-  end
-
-  create_table "admin_menus", comment: "后台菜单", force: :cascade do |t|
-    t.bigint "created_admin", null: false, comment: "创建者id"
-    t.datetime "created_at", comment: "创建时间"
-    t.string "icon", comment: "菜单图标"
+  create_table "admin_menus", force: :cascade do |t|
+    t.bigint "created_admin", default: 0, null: false, comment: "创建者id"
+    t.datetime "created_at", null: false
+    t.string "icon", default: "", comment: "菜单图标"
     t.boolean "is_deleted", default: false, null: false, comment: "是否删除"
     t.boolean "keep_alive", default: false, null: false, comment: "页面是否保持状态"
-    t.bigint "parent_m_id", comment: "父菜单id"
+    t.bigint "parent_m_id", default: 0, null: false, comment: "父菜单id"
     t.string "path", null: false, comment: "菜单路径"
     t.boolean "show", default: true, null: false, comment: "是否显示在菜单上"
     t.integer "sort_order", default: 0, null: false, comment: "菜单排序"
-    t.integer "status", limit: 2, default: 0, null: false, comment: "状态 1显示 0隐藏"
-    t.string "title", null: false, comment: "菜单名称"
-    t.datetime "updated_at", comment: "更新时间"
-    t.index ["parent_m_id"], name: "index_admin_menus_on_parent_m_id"
-    t.index ["path"], name: "index_admin_menus_on_path", unique: true
+    t.integer "status", default: 0, null: false, comment: "状态 1显示 0隐藏"
+    t.string "title", default: "", null: false, comment: "菜单名称"
+    t.datetime "updated_at", null: false
+    t.index ["created_admin"], name: "index_admin_menus_on_created_admin"
   end
 
   create_table "admin_menus_news", force: :cascade do |t|
@@ -75,13 +60,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_08_080640) do
     t.index ["role"], name: "index_admin_news_on_role"
   end
 
-  create_table "admin_powers", comment: "后台权限", force: :cascade do |t|
-    t.datetime "created_at", comment: "创建时间"
-    t.string "menu_id", limit: 255, null: false, comment: "菜单id"
-    t.string "name", null: false, comment: "权限名称"
-    t.integer "status", limit: 2, default: 0, null: false, comment: "状态"
-    t.datetime "updated_at", comment: "更新时间"
-    t.index ["menu_id"], name: "index_admin_powers_on_menu_id"
+  create_table "admin_powers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "menu_id", null: false
+    t.string "name"
+    t.integer "status"
+    t.datetime "updated_at", null: false
   end
 
   create_table "admin_powers_new", force: :cascade do |t|
@@ -92,26 +76,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_08_080640) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "movies", comment: "电影主数据（抓取自 ssr1.scrape.center）", force: :cascade do |t|
+  create_table "admins", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", comment: "邮箱"
+    t.text "password_digest", null: false, comment: "密码"
+    t.string "phone", null: false, comment: "手机号"
+    t.text "remark", comment: "备注"
+    t.integer "role", default: 0, null: false, comment: "角色"
+    t.integer "status", default: 0, null: false, comment: "状态"
+    t.datetime "updated_at", null: false
+    t.string "username", null: false, comment: "用户名"
+    t.index ["role"], name: "index_admins_on_role"
+  end
+
+  create_table "movies", force: :cascade do |t|
     t.jsonb "actors", default: [], null: false, comment: "演员列表（jsonb 数组，对象含 name/role/image 等）"
     t.jsonb "categories", default: [], null: false, comment: "类型标签（jsonb 数组，例如：[\"剧情\",\"爱情\"]）"
-    t.datetime "created_at", null: false, comment: "创建时间"
+    t.datetime "created_at", null: false
     t.jsonb "directors", default: [], null: false, comment: "导演姓名（jsonb 数组）"
-    t.text "drama", comment: "剧情简介"
+    t.string "drama", comment: "剧情简介"
     t.integer "duration_minutes", comment: "片长（分钟）"
     t.integer "is_deleted", default: 0, null: false, comment: "0否 1是"
-    t.text "poster_url", comment: "海报图片地址"
-    t.decimal "rating", precision: 3, scale: 1, comment: "评分（一位小数）"
+    t.string "poster_url", comment: "海报图片地址"
+    t.decimal "rating", precision: 2, scale: 1, null: false, comment: "评分（一位小数）"
     t.string "region", comment: "国家/地区"
     t.date "release_date", comment: "上映日期"
     t.integer "source_id", null: false, comment: "站点详情页数字 ID（/detail/:id），用于 upsert 去重"
     t.text "source_url", null: false, comment: "详情页完整 URL，便于溯源"
     t.jsonb "subtitle", default: [], null: false, comment: "剧照图片地址"
-    t.string "title", null: false, comment: "片名"
-    t.datetime "updated_at", null: false, comment: "更新时间"
+    t.string "title", comment: "片名"
+    t.datetime "updated_at", null: false
     t.index ["duration_minutes"], name: "index_movies_on_duration_minutes"
-    t.index ["rating"], name: "index_movies_on_rating"
-    t.index ["region"], name: "index_movies_on_region"
     t.index ["release_date"], name: "index_movies_on_release_date"
     t.index ["title"], name: "index_movies_on_title"
   end
@@ -136,28 +131,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_08_080640) do
     t.index ["duration_minutes"], name: "index_movies_new_on_duration_minutes"
     t.index ["release_date"], name: "index_movies_new_on_release_date"
     t.index ["title"], name: "index_movies_new_on_title"
-  end
-
-  create_table "moviescopy", id: :bigint, default: -> { "nextval('movies_id_seq1'::regclass)" }, comment: "电影主数据", force: :cascade do |t|
-    t.jsonb "actors", default: [], null: false, comment: "演员列表"
-    t.jsonb "categories", default: [], null: false, comment: "类型标签"
-    t.datetime "created_at", null: false, comment: "创建时间"
-    t.jsonb "directors", default: [], null: false, comment: "导演姓名"
-    t.text "drama", comment: "剧情简介"
-    t.integer "duration_minutes", comment: "片长（分钟）"
-    t.text "poster_url", comment: "海报图片地址"
-    t.decimal "rating", precision: 3, scale: 1, comment: "评分（一位小数）"
-    t.string "region", comment: "国家/地区"
-    t.date "release_date", comment: "上映日期"
-    t.integer "source_id", null: false, comment: "站点详情页数字 ID"
-    t.text "source_url", null: false, comment: "详情页完整 URL"
-    t.jsonb "subtitle", default: [], null: false, comment: "剧照图片地址"
-    t.string "title", null: false, comment: "片名"
-    t.datetime "updated_at", null: false, comment: "更新时间"
-    t.index ["actors"], name: "index_movies_on_actors", using: :gin
-    t.index ["categories"], name: "index_movies_on_categories", using: :gin
-    t.index ["directors"], name: "index_movies_on_directors", using: :gin
-    t.index ["source_id"], name: "index_movies_on_source_id", unique: true
   end
 
   create_table "request_logs", id: :serial, force: :cascade do |t|
@@ -296,6 +269,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_08_080640) do
     t.index ["expires_at"], name: "index_solid_queue_semaphores_on_expires_at"
     t.index ["key", "value"], name: "index_solid_queue_semaphores_on_key_and_value"
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "password_digest"
+    t.string "phone"
+    t.integer "status"
+    t.datetime "updated_at", null: false
+    t.string "username"
   end
 
   create_table "users_new", force: :cascade do |t|

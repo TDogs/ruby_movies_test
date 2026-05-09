@@ -1,11 +1,8 @@
 module Api
   class MoviesController < BaseController
     def home
-      puts " ================== params: #{params} ================== "
       page = [ params.fetch(:page, 1).to_i, 1 ].max
       page_size = [ [ params.fetch(:page_size, 10).to_i, 1 ].max, 60 ].min
-      # @movies = Movie.order(id: :desc).offset((page - 1) * page_size).limit(page_size)
-
       base_scope = Movie.filter(filter_params)
       @movies = base_scope
       .offset((page - 1) * page_size)

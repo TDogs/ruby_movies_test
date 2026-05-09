@@ -1,25 +1,25 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  created_admin: 
+  created_admin: 1
   icon: MyString
   is_deleted: false
   keep_alive: false
   parent_m_id: 
+  title: MyString
   path: MyString
   show: false
   sort_order: 1
   status: 1
-  title: MyString
 
 two:
-  created_admin: 
+  created_admin: 1
   icon: MyString
   is_deleted: false
   keep_alive: false
   parent_m_id: 
+  title: MyString
   path: MyString
   show: false
   sort_order: 1
   status: 1
-  title: MyString

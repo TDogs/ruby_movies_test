@@ -11,22 +11,20 @@ module Admins
       auth_header = request.headers["AccessToken"].to_s
       match = auth_header.match(/\Abearer\s+(.+)\z/)
 
-      return render_unauthorized!("AccessToken 格式错误，应为: bearer <jwt>") unless match
+      return render_unauthorized!("Token 格式错误，应为: bearer <jwt>") unless match
 
       token = match[1].to_s
       payload = decode_token(token)
       return unless payload
 
       if JwtDenylist.revoked?(payload["jti"])
-        return render_unauthorized!("JWT 已登出失效，请重新登录")
+        return render_unauthorized!("Token 已登出失效，请重新登录")
       end
 
       @current_admin_token = token
       @current_admin_jwt = payload
       @current_admin_payload = extract_sub_payload(payload["sub"])
-      admin_id = @current_admin_payload["id"]
-      @current_admin = ::AdminNew.find_by(id: admin_id)
-
+      @current_admin = ::Admin.find_by(id: @current_admin_payload["id"])
       render_unauthorized!("管理员不存在") unless @current_admin
     end
 
@@ -43,7 +41,7 @@ module Admins
       raw_payload.is_a?(Hash) ? raw_payload.with_indifferent_access : {}
     end
 
-    # 设置不走验证
+    # set no check
     def jwt_public_action?
       controller_name == "admin" && action_name == "login" || action_name == "register"
     end
@@ -52,13 +50,11 @@ module Admins
       render json: { error: message }, status: :unauthorized
     end
 
-    # 兼容 Admin 端控制器使用的统一 JSON 渲染方法
     def render_json(data:, status: :ok)
       render json: data, status:
     end
 
 
-    # 统一错误返回
     def render_error(message:, status: :bad_request, details: nil)
       payload = { error: message }
       payload[:details] = details if details.present?

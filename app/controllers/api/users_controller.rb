@@ -21,7 +21,7 @@ module Api
       attrs = filter_params
 
       # check if user exists
-      hasUser = UsersNew.find_by(username: attrs[:username])
+      hasUser = User.find_by(username: attrs[:username])
       expires_in = 2.hours.to_i
       if hasUser.present?
         if hasUser&.authenticate(params[:password])
@@ -40,7 +40,7 @@ module Api
         end
       else
         # register
-        u = UsersNew.new(attrs)
+        u = User.new(attrs)
         return render_error(message: u.errors.full_messages.to_sentence) unless u.save
         token = Utils.build_user_jwt(u, exp_seconds: expires_in)
         render json: {
@@ -60,6 +60,8 @@ module Api
 
     # user info
     def info
+      logger.info("用户信息: #{current_user.inspect}")
+
       render_json(data: {
         code: 200,
         msg: "success",

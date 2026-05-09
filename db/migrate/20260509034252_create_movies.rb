@@ -1,6 +1,6 @@
-class CreateMoviesNews < ActiveRecord::Migration[8.1]
+class CreateMovies < ActiveRecord::Migration[8.1]
   def change
-    create_table :movies_new do |t|
+    create_table :movies do |t|
       t.jsonb :actors, default: [], null: false, comment: "演员列表（jsonb 数组，对象含 name/role/image 等）"
       t.jsonb :categories, default: [], null: false, comment: "类型标签（jsonb 数组，例如：[\"剧情\",\"爱情\"]）"
       t.jsonb :directors, default: [], null: false, comment: "导演姓名（jsonb 数组）"

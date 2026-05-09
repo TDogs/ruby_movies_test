@@ -1,8 +1,8 @@
-class CreateAdminNews < ActiveRecord::Migration[8.1]
+class CreateAdmins < ActiveRecord::Migration[8.1]
   def change
-    create_table :admin_news do |t|
+    create_table :admins do |t|
       t.string :email, comment: "邮箱"
-      t.text :password, comment: "密码", null: false
+      t.text :password_digest, comment: "密码", null: false
       t.string :phone, comment: "手机号", null: false
       t.text :remark, comment: "备注"
       t.integer :role,  index: true, comment: "角色", default: 0, null: false

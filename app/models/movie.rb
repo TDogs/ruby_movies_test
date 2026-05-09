@@ -1,7 +1,7 @@
 class Movie < ApplicationRecord
   self.table_name = "movies"  # 显示表名
   # 验证 根据 source_id
-  validates :source_id, presence: true, uniqueness: { case_sensitive: true, message: "已存在" }
+  # validates :source_id, presence: true, uniqueness: { case_sensitive: true, message: "已存在" }
 
 
   # 查询构建条件

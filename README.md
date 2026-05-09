@@ -1,12 +1,18 @@
-## 配置文件：
+## 1、配置文件：
 .env 配置相关连接
 
-## 表迁移：
+## 2、表迁移：
 ```
 bin/rails db:migrate
 ```
 
-## 启动（Web + Worker）：
+## 3、生成模拟数据：
+```
+rails db:seed
+```
+
+
+## 4、启动（Web + Worker）：
 ```
 bin/dev
 ```
@@ -14,7 +20,7 @@ bin/dev
 ## 队列 切换db 和 redis：
 
 ```gemfile 增加
-gem "sidekiq", "< 8"    可选 <8，若 >=8 redis要大于7，反之大于6
+gem "sidekiq", "< 8"    若 >=8 redis要大于7，反之大于6
 
 bundle install
 
@@ -30,6 +36,4 @@ redis下 需要手动显示的增加监听队列，在config/sideiq.yml中
 ```
 
 
-### 数据库：movies_sql.sql
-
-### 后台测试账号 admin admin123
+### 参考sql数据：movies_sql.sql 可仅导入movies表数据展示效果。1，2，3步骤之后
