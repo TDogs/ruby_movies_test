@@ -35,7 +35,7 @@ module Admins
 
     def info
       # current_admin = admin实例
-      data = current_admin.getInfoAndMenus(current_admin_payload)
+      data = current_admin.get_menus(current_admin_payload)
       render json: {
         code: 200,
         msg: "success",

@@ -10,9 +10,47 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_09_034252) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_14_094434) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "action_text_rich_texts", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
+  end
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "admin_menus", force: :cascade do |t|
     t.bigint "created_admin", default: 0, null: false, comment: "创建者id"
@@ -78,18 +116,51 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_09_034252) do
 
   create_table "admins", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "email", comment: "邮箱"
-    t.text "password_digest", null: false, comment: "密码"
-    t.string "phone", null: false, comment: "手机号"
-    t.text "remark", comment: "备注"
-    t.integer "role", default: 0, null: false, comment: "角色"
-    t.integer "status", default: 0, null: false, comment: "状态"
+    t.string "email"
+    t.integer "is_deleted", default: 0, null: false
+    t.text "password_digest", null: false
+    t.string "phone", null: false
+    t.text "remark"
+    t.integer "role", default: 0, null: false
+    t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.string "username", null: false, comment: "用户名"
-    t.index ["role"], name: "index_admins_on_role"
+    t.string "username", null: false
+    t.index ["username"], name: "ix_admins_username"
+  end
+
+  create_table "alembic_version", primary_key: "version_num", id: { type: :string, limit: 32 }, force: :cascade do |t|
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.bigint "post_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "userts_id", null: false
+    t.index ["post_id"], name: "index_comments_on_post_id"
+    t.index ["userts_id"], name: "index_comments_on_userts_id"
   end
 
   create_table "movies", force: :cascade do |t|
+    t.jsonb "actors", default: [], null: false
+    t.jsonb "categories", default: [], null: false
+    t.datetime "created_at", null: false
+    t.jsonb "directors", default: [], null: false
+    t.string "drama"
+    t.integer "duration_minutes"
+    t.integer "is_deleted", default: 0, null: false
+    t.string "poster_url"
+    t.decimal "rating", precision: 2, scale: 1, null: false
+    t.string "region"
+    t.date "release_date"
+    t.integer "source_id", null: false
+    t.text "source_url", null: false
+    t.jsonb "subtitle", default: [], null: false
+    t.string "title"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "movies_copy1", id: :bigint, default: -> { "nextval('movies_id_seq'::regclass)" }, force: :cascade do |t|
     t.jsonb "actors", default: [], null: false, comment: "演员列表（jsonb 数组，对象含 name/role/image 等）"
     t.jsonb "categories", default: [], null: false, comment: "类型标签（jsonb 数组，例如：[\"剧情\",\"爱情\"]）"
     t.datetime "created_at", null: false
@@ -106,9 +177,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_09_034252) do
     t.jsonb "subtitle", default: [], null: false, comment: "剧照图片地址"
     t.string "title", comment: "片名"
     t.datetime "updated_at", null: false
-    t.index ["duration_minutes"], name: "index_movies_on_duration_minutes"
-    t.index ["release_date"], name: "index_movies_on_release_date"
-    t.index ["title"], name: "index_movies_on_title"
+    t.index ["duration_minutes"], name: "index_movies_on_duration_minutes_copy1"
+    t.index ["release_date"], name: "index_movies_on_release_date_copy1"
+    t.index ["title"], name: "index_movies_on_title_copy1"
   end
 
   create_table "movies_new", force: :cascade do |t|
@@ -133,10 +204,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_09_034252) do
     t.index ["title"], name: "index_movies_new_on_title"
   end
 
+  create_table "posts", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.bigint "usert_id", null: false
+    t.index ["usert_id"], name: "index_posts_on_usert_id"
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "inventory_count", default: 0, null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "request_logs", id: :serial, force: :cascade do |t|
     t.text "request", null: false
     t.text "response", null: false
     t.index ["id"], name: "ix_request_logs_id"
+  end
+
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|
@@ -271,14 +368,67 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_09_034252) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "subscribers", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email"
-    t.string "password_digest"
-    t.string "phone"
-    t.integer "status"
+    t.bigint "product_id", null: false
     t.datetime "updated_at", null: false
-    t.string "username"
+    t.index ["product_id"], name: "index_subscribers_on_product_id"
+  end
+
+  create_table "t_attributes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "t_categories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.integer "parent_id", default: 0, null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "t_categories_attributes", force: :cascade do |t|
+    t.integer "attribute_id", null: false
+    t.integer "category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attribute_id"], name: "index_t_categories_attributes_on_attribute_id"
+    t.index ["category_id"], name: "index_t_categories_attributes_on_category_id"
+  end
+
+  create_table "t_goods", force: :cascade do |t|
+    t.integer "category_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_t_goods_on_category_id"
+  end
+
+  create_table "t_goods_attribute_values", force: :cascade do |t|
+    t.integer "attribute_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "goods_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "value"
+    t.index ["attribute_id"], name: "index_t_goods_attribute_values_on_attribute_id"
+    t.index ["goods_id"], name: "index_t_goods_attribute_values_on_goods_id"
+  end
+
+  create_table "test_uploads", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.string "title"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_address", null: false
+    t.string "password_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
   create_table "users_new", force: :cascade do |t|
@@ -291,10 +441,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_09_034252) do
     t.string "username", null: false
   end
 
+  create_table "users_old", id: :bigint, default: -> { "nextval('users_id_seq'::regclass)" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "password_digest"
+    t.string "phone"
+    t.integer "status"
+    t.datetime "updated_at", null: false
+    t.string "username"
+  end
+
+  create_table "userts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "comments", "posts"
+  add_foreign_key "comments", "userts", column: "userts_id"
+  add_foreign_key "posts", "userts"
+  add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "subscribers", "products"
+  add_foreign_key "t_categories_attributes", "t_attributes", column: "attribute_id"
+  add_foreign_key "t_categories_attributes", "t_categories", column: "category_id"
+  add_foreign_key "t_goods", "t_categories", column: "category_id"
+  add_foreign_key "t_goods_attribute_values", "t_attributes", column: "attribute_id"
+  add_foreign_key "t_goods_attribute_values", "t_goods", column: "goods_id"
 end

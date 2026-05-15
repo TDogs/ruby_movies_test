@@ -43,18 +43,25 @@ module Admins
     def update
       movie = Movie.find(params[:id])
       attrs = movie_update_params
-      r = movie.update(attrs)
-
+      file = attrs["poster_url"].presence || attrs[:poster_url].presence
+      if file.present?
+        ActiveRecord::Base.transaction do
+          movie.update!(attrs.except("poster_url", :poster_url))
+          movie.assign_image_upload_then_persist!(file)
+        end
+      else
+        unless movie.update(attrs.except("poster_url", :poster_url))
+          return render json: { message: movie.errors }, status: :unprocessable_entity
+        end
+      end
       render json: {
-        code: r ? 200 : 422,
-        msg: r ? "success" : "failed",
-        data: {
-          attrs: attrs,
-          previous_changes: movie.previous_changes,
-          errors: movie.errors.full_messages,
-          movie: movie
-        }
+        code: 200,
+        msg: "success"
       }
+    rescue ActiveRecord::RecordInvalid
+      render json: { record_invalid_message: movie.errors }, status: :unprocessable_entity
+    rescue StandardError => e
+      render json: { other_message: e.message }, status: :unprocessable_entity
     end
 
     def del
@@ -76,7 +83,7 @@ module Admins
 
         Movie.find(params[:id]).update(poster_url: file.original_filename)
 
-        render json: { msg: "文件上传成功", code: 200, data: { file_path: absolute_path } }
+        render json: { msg: "文件上传成功", code: 200, data: { file_path: "xxxxxxxxxxxx" } }
       else
         render json: { msg: "文件上传失败", code: 200, data: {} }
       end
@@ -87,12 +94,14 @@ module Admins
     def movie_update_params
       raw = params.permit(
         :rating, :release_date, :duration_minutes, :region, :poster_url, :drama,
+        :image, # 单文件上传用标量 permit；image: [] 是给「数组参数」用的，容易拦掉 UploadedFile
+        :director, # 可与 directors 二选一：单字符串/逗号分隔
         directors: [ :name ], # 对象
         categories: [] # 数组 可以传多个
       )
 
       attrs = raw.to_h
-      directors = attrs["directors"].presence || director
+      directors = attrs["directors"].presence || attrs["director"]
       if directors.present?
         if directors.is_a?(Array) && directors.all? { |d| d.is_a?(Hash) && d["name"].present? }
           attrs["directors"] = directors

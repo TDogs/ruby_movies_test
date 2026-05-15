@@ -1,6 +1,20 @@
 module Admins
   class BaseController < ApplicationController
-    skip_forgery_protection
+    # set status constants
+    RESPONSE_HTTP_STATUSES = {
+      ok: 200,
+      err: 300,
+      bad_request: 400,
+      unauthorized: 401,
+      forbidden: 403,
+      not_found: 404,
+      conflict: 409,
+      unprocessable_entity: 422,
+      internal_server_error: 500
+    }.freeze
+
+    skip_forgery_protection #  close csrf verify
+    rescue_from ActiveRecord::RecordNotFound, with: :render_record_not_found  # 拦截器 拦截所有与find这种严格查询 并抛notfund错误的
     before_action :authenticate_admin_jwt!, unless: :jwt_public_action?
 
     private
@@ -43,7 +57,12 @@ module Admins
 
     # set no check
     def jwt_public_action?
-      controller_name == "admin" && action_name == "login" || action_name == "register"
+      %w[admin#login admin#register test_uploads#create test_uploads#destroy test_uploads#show test_uploads#update test_uploads#index_multi test_uploads#create_multi test_uploads#show_multi test_uploads#update_multi].include?("#{controller_name}##{action_name}")
+    end
+
+    # 统一返回 删除后 再次查询记录不存在 报错。或改写查询方法
+    def render_record_not_found(_exception)
+      render_json(data: { code: RESPONSE_HTTP_STATUSES[:err], msg: "记录不存在或已删除", data: nil })
     end
 
     def render_unauthorized!(message)
@@ -58,7 +77,8 @@ module Admins
     def render_error(message:, status: :bad_request, details: nil)
       payload = { error: message }
       payload[:details] = details if details.present?
-      render json: payload, status:
+      http_status = RESPONSE_HTTP_STATUSES.fetch(status, status)
+      render json: payload, status: http_status
     end
   end
 end

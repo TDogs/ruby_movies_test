@@ -25,6 +25,9 @@ gem "rack-cors"
 # add new bcrypt 依赖
 gem 'bcrypt', '~> 3.1.7'
 
+# add new aliyunoss 依赖
+gem "aliyunoss-activestorage-adapter", "~> 0.1"
+
 # add new caxlsx 依赖
 gem "caxlsx"
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]

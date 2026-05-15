@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  goods_id: 1
+  attribute_id: 1
+  value: MyString
+  string: MyString
+
+two:
+  goods_id: 1
+  attribute_id: 1
+  value: MyString
+  string: MyString

@@ -51,8 +51,6 @@ Rails.application.routes.draw do
   scope :admin, module: :admins do
     post "login", to: "admin#login"
     post "register", to: "admin#register"
-
-    scope :auth do
       get "profile", to: "protected#profile"
       get "info", to: "admin#info"
       get "movies", to: "movies#list"
@@ -60,6 +58,30 @@ Rails.application.routes.draw do
       post "movies/update/:id", to: "movies#update"
       post "movies/del/:id", to: "movies#del"
       post "upload", to: "movies#upload"
-    end
+
+      # 资源 测试 本地 阿里oss 单图（create/update）/ 多图（*_multi）
+      resources :test_uploads, only: %i[index show create update destroy] do
+        collection do
+          get  :multi, action: :index_multi   # GET  /admin/test_uploads/multi
+          post :multi, action: :create_multi # POST /admin/test_uploads/multi  body: title, body, images[] (flat, no test_upload wrapper)
+        end
+
+        member do
+          get   :multi, action: :show_multi    # GET   /admin/test_uploads/:id/multi
+          patch :multi, action: :update_multi # PATCH /admin/test_uploads/:id/multi
+        end
+      end
+
+
+    # 不严谨 手动测试 参数按规定看好来
+    resources :goods
+    resources :attributes
+    get "attribute_options", to: "attributes#attribute_options"
+    get "select_categories", to: "categories#select_categories" # get parent id = 0
+    get "selected_attributes_by_category_id/:category_id", to: "categories#selected_attributes_by_category_id"
+    put "update_category_attribute_by_id/:category_id", to: "categories#update_category_attribute_by_id"
+    resources :categories
+    resources :goods_attribute_values
+    resources :categories_attributes
   end
 end

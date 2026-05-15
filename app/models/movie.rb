@@ -2,6 +2,33 @@ class Movie < ApplicationRecord
   self.table_name = "movies"  # 显示表名
   # 验证 根据 source_id
   # validates :source_id, presence: true, uniqueness: { case_sensitive: true, message: "已存在" }
+  has_one_attached :poster
+
+  def assign_image_upload_then_persist!(uploaded_file)
+    return if uploaded_file.blank?
+
+    poster.detach if poster.attached?
+
+    p " ================== 上传文件: #{uploaded_file} ================== "
+    p " ================== 上传文件原始文件名: #{uploaded_file.original_filename} ================== "
+    p " ================== 上传文件内容类型: #{uploaded_file.content_type} ================== "
+    p " ================== 上传文件服务名称: #{:aliyun} ================== "
+    blob = ActiveStorage::Blob.create_and_upload!(
+      io: uploaded_file,
+      filename: uploaded_file.original_filename,
+      content_type: uploaded_file.content_type,
+    )
+
+    poster.attach(blob)
+  end
+
+  def poster_url
+    poster.attached? ? poster.url : self[:poster_url]
+  end
+
+  def as_json(options = {})
+    super(options).merge("poster_url" => poster_url)
+  end
 
 
   # 查询构建条件

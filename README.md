@@ -36,4 +36,7 @@ redis下 需要手动显示的增加监听队列，在config/sideiq.yml中
 ```
 
 
+### 上传阿里云oss
+不要在model层指定service，测试在development.rb，生产在production.rb中配置 “active_storage”，
+
 ### 参考sql数据：movies_sql.sql 可仅导入movies表数据展示效果。1，2，3步骤之后

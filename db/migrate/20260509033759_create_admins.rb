@@ -13,3 +13,6 @@ class CreateAdmins < ActiveRecord::Migration[8.1]
     end
   end
 end
+
+# # admins.role 引用 admin_powers.id（列名仍叫 role，不用 admin_power_id）
+# t.foreign_key :admin_powers, column: :role, primary_key: :id

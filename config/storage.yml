@@ -25,3 +25,18 @@ local:
 #   service: Mirror
 #   primary: local
 #   mirrors: [ amazon, google, microsoft ]
+
+
+aliyun:
+  service: "Aliyunoss"
+
+  access_key_id: <%= ENV["ALIYUN_ACCESS_KEY_ID"] %>
+  access_key_secret: <%= ENV["ALIYUN_ACCESS_KEY_SECRET"] %>
+
+  bucket: <%= ENV["ALIYUN_BUCKET"] %>
+
+  location: <%= ENV["ALIYUN_LOCATION"] %>
+
+  path: <%= ENV.fetch("ALIYUN_PATH", "/") %>
+
+  is_public: <%= %w[true 1 yes].include?(ENV["ALIYUN_IS_PUBLIC"]&.downcase) %>

@@ -23,5 +23,14 @@ module RailsTest
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+
+
+    # scaffold 跳过 helper，css，js 文件
+    config.generators do |cfg|
+      cfg.stylesheets     false
+      cfg.javascripts     false
+      cfg.helpers         false
+    end
   end
 end
